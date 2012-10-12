@@ -18,7 +18,7 @@
 					/* OPTIONS */
 				var settings = $.extend({
 
-					letters : 'Bxm-.', //letters used, dark to light
+					letters : 'XMI/-.', //letters used, dark to light
 					invert : false //invert the letters if light text is used on a dark background
 
 			}, options);
