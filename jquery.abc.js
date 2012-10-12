@@ -70,13 +70,13 @@
 
 				}
 
-				var pic = $('<canvas>', {class: 'ascii-picture'}).attr(dimensions).hide();
+				var pic = $('<canvas>', {class: 'abc-picture'}).attr(dimensions).hide();
 
 				var picCtx = pic[0].getContext('2d');
 
-				var text = $('<div>', {class : "ascii-text"}).css('font-family','monospace').css(dimensions);
+				var text = $('<div>', {class : "abc-text"}).css('font-family','monospace').css(dimensions);
 
-				$img.hide().wrap($('<span>',{class : 'ascii-wrapper'}).css('display' , 'inline-block')).after(pic, text);
+				$img.hide().wrap($('<span>',{class : 'abc-wrapper'}).css('display' , 'inline-block')).after(pic, text);
 
 				picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
@@ -152,7 +152,7 @@
 
 			return this.each(function(){
 
-				$(this).show().next('.ascii-picture').remove().end().next('.ascii-text').remove().end().unwrap();
+				$(this).show().next('.abc-picture').remove().end().next('.abc-text').remove().end().unwrap();
 
 			});
 
