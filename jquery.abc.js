@@ -110,7 +110,6 @@
 
 					}
 
-
 				for (var l = 0; l < blocks.y; l++){
 
 					for (var m = 0; m < blocks.x; m++){
@@ -121,7 +120,9 @@
 
 							$.each(colors, function(){
 
-								if (blockArray[0] < this.top && blockArray[0] >= this.bottom){
+								//console.log(blockArray[0]);
+
+								if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
 
 									letter = this.letter;
 									return false;
