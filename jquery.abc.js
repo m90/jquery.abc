@@ -66,10 +66,11 @@
 						y : ~~(dimensions.height / charSize.y)
 
 					},
-					pic = $('<canvas>', {class: 'abc-picture'}).attr(dimensions).hide(),
+					pic = $('<canvas>', {'class' : 'abc-picture'}).attr(dimensions).hide(),
 					picCtx = pic[0].getContext('2d');
 
-					$img.hide().wrap($('<span>', {class : 'abc-wrapper'}).css('display' , 'inline-block')).after(pic);
+					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height, 'overflow' : 'hidden'}).css('display' , $img.css('display'))).after(pic);
+					$img.hide();
 
 					picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
@@ -132,7 +133,7 @@
 
 					}
 
-					var art = '<pre>' + letters.join('') + '</pre>';
+					var art = '<pre style="line-height:' + charSize.y + 'px;">' + letters.join('') + '</pre>';
 					$img.after(art);
 
 
