@@ -25,125 +25,122 @@
 
 			return this.each(function(){
 
-				var letters = settings.letters.split('');
+				if (this.nodeName === 'IMG'){
 
-				if (settings.invert){
+					var
+					$img = $(this),
+					letters = settings.invert ? settings.letters.split('').reverse() : settings.letters.split(''),
+					colors = [],
+					dimensions = {
+					
+						width: $img.width(),
+						height: $img.height()
+					
+					};
 
-					letters.reverse();
+					for (var a = 0; a < letters.length; a++){
 
-				}
+						colors.push({
 
-				var colors = [];
+							top: 255 / letters.length * (a + 1),
+							bottom: 255 / letters.length * a,
+							letter: letters[a]
+							
+						});
 
-				for (var a = 0; a < letters.length; a++){
+					};
 
-					colors.push({
+					var dummy = $('<span>').text('a').css({'font-family' : 'monospace', 'visibility' : 'hidden'});
+					$('body').append(dummy);
+					
+					var charSize = {
+						x : dummy.width(),
+						y : dummy.height()
+					};
 
-						top: 255 / letters.length * (a + 1),
-						bottom: 255 / letters.length * a,
-						letter: letters[a]
-						
-					});
+					dummy.remove();
+					
+					var blocks = {
 
-				};
+						x : ~~(dimensions.width / charSize.x),
+						y : ~~(dimensions.height / charSize.y)
 
-				var dummy = $('<span>').text('a').css('font-family','monospace');
-				$('body').append(dummy);
+					},
+					pic = $('<canvas>', {class: 'abc-picture'}).attr(dimensions).hide(),
+					picCtx = pic[0].getContext('2d');
 
-				var charSize = {
-					x : dummy.width(),
-					y : dummy.height()
-				};
+					$img.hide().wrap($('<span>', {class : 'abc-wrapper'}).css('display' , 'inline-block')).after(pic);
 
-				var $img = $(this);
-				var dimensions = {
-					width: $img.width(),
-					height: $img.height()
-				};
+					picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
-				dummy.remove();
+					var pixelArray = picCtx.getImageData(0, 0, dimensions.width, dimensions.height).data;
 
-				var blocks = {
+					pic.remove();
 
-					x : ~~(dimensions.width / charSize.x),
-					y : ~~(dimensions.height / charSize.y)
+					var blockArray = [];
 
-				}
+					for (var h = 0; h < blocks.y; h++){ //move along y at block level
 
-				var pic = $('<canvas>', {class: 'abc-picture'}).attr(dimensions).hide();
+						for (var i = 0; i < blocks.x; i++){ //move along x at block level
 
-				var picCtx = pic[0].getContext('2d');
+								var pixelsInBlock = [];
+								var baseOffset = h * charSize.y * dimensions.width * 4 + i * charSize.x * 4;
 
-				var text = $('<div>', {class : "abc-text"}).css('font-family','monospace').css(dimensions);
+								for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
 
-				$img.hide().wrap($('<span>',{class : 'abc-wrapper'}).css('display' , 'inline-block')).after(pic, text);
+									for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
+										
+										var currentOffset = baseOffset + (j * dimensions.width * 4 + k * 4);
 
-				picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
+										var weight = (pixelArray[currentOffset] + pixelArray[currentOffset + 1] + pixelArray[currentOffset + 2]) / 3;
 
-				var pixelArray = picCtx.getImageData(0, 0, dimensions.width, dimensions.height).data;
-				var blockArray = [];
+										pixelsInBlock.push(weight);
 
-				for (var h = 0; h < blocks.y; h++){ //move along y
-
-					for (var i = 0; i < blocks.x; i++){ //move along x
-
-							var pixelsInBlock = [];
-							var baseOffset = h * charSize.y * dimensions.width * 4 + i * charSize.x * 4;
-
-							for (var j = 0; j < charSize.y; j++){
-
-								for (var k = 0; k < charSize.x; k++){
-									
-									var currentOffset = baseOffset + (j * dimensions.width * 4 + k * 4);
-
-									var weight = (pixelArray[currentOffset] + pixelArray[currentOffset + 1] + pixelArray[currentOffset + 2]) / 3;
-
-									pixelsInBlock.push(weight);
+									}
 
 								}
 
-							}
+								blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
 
-							blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
+							}
 
 						}
 
-					}
+					
+					var letters = [];
 
-				for (var l = 0; l < blocks.y; l++){
+					for (var l = 0; l < blocks.y; l++){
 
-					for (var m = 0; m < blocks.x; m++){
+						for (var m = 0; m < blocks.x; m++){
 
-						text.html(function(){
+								$.each(colors, function(){
 
-							var letter;
+									if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
 
-							$.each(colors, function(){
-
-								//console.log(blockArray[0]);
-
-								if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
-
-									letter = this.letter;
-									return false;
+										letters.push(this.letter);
+										return false;
 
 									}
 
 								});
 
-								return $(this).html() + letter;
-							});
+								blockArray.shift();
 
-							blockArray.shift();
+							}
 
-						}
+							letters.push('\n');
 
-						text.html(function(){
-							return $(this).html() + '<br>';
-						});
+					}
+
+					var art = '<pre>' + letters.join('') + '</pre>';
+					$img.after(art);
+
+
+				} else {
+
+					$.error('.abc() can only be applied to image elements!');
 
 				}
-
 
 			});
 
@@ -153,7 +150,7 @@
 
 			return this.each(function(){
 
-				$(this).show().next('.abc-picture').remove().end().next('.abc-text').remove().end().unwrap();
+				$(this).show().next('pre').remove().end().unwrap();
 
 			});
 
