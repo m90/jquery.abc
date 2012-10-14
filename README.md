@@ -8,7 +8,7 @@ A sluggish demo can be found **[here](http://frederikring.com/abc/)**
 **BETA AS BETA CAN BE** use at your own risk.
 
 ###Me? Worry?###
-```
+<pre style="font-size: 8px; line-height: 8px;">
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,4 +94,4 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXM---I//II/IM//XXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXM--I/IM/-/MMIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXI----
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXM-IIMM--/IMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXM/---
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXMMMMI---IMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXI---
-```
+</pre>
