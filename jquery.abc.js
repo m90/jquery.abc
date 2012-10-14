@@ -15,11 +15,11 @@
 
 			options || (options = {}); //options passed?
 
-					/* OPTIONS */
-				var settings = $.extend({
+			/* OPTIONS */
+			var settings = $.extend({
 
-					letters : 'XMI/-.', //letters used, dark to light
-					invert : false //invert the letters if light text is used on a dark background
+				letters : 'XMI/-.', //letters used, dark to light
+				invert : false //invert the letters if light text is used on a dark background
 
 			}, options);
 
@@ -50,8 +50,7 @@
 
 					};
 
-					var dummy = $('<span>').text('a').css({'font-family' : 'monospace', 'visibility' : 'hidden'});
-					$('body').append(dummy);
+					var dummy = $('<span>').text('a').css({'font-family' : 'monospace', 'visibility' : 'hidden'}).appendTo($img.parent());
 					
 					var charSize = {
 						x : dummy.width(),
@@ -89,26 +88,26 @@
 
 						for (var i = 0; i < blocks.x; i++){ //move along x at block level
 
-								var pixelsInBlock = [];
-								var baseOffset = h * charSize.y * dimensions.width + i * charSize.x;
+							var pixelsInBlock = [];
+							var baseOffset = h * charSize.y * dimensions.width + i * charSize.x;
 
-								for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
+							for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
 
-									for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
+								for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
 										
-										var currentOffset = baseOffset + (j * dimensions.width + k);
-										pixelsInBlock.push(reducedPixelArray[currentOffset]);
-
-									}
+									var currentOffset = baseOffset + (j * dimensions.width + k);
+									pixelsInBlock.push(reducedPixelArray[currentOffset]);
 
 								}
 
-								//average all pixels in the block and push into blockArray
-								blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
-
 							}
 
+							//average all pixels in the current block and push into blockArray
+							blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
+
 						}
+
+					}
 
 					
 					var letters = [];
@@ -117,25 +116,26 @@
 
 						for (var m = 0; m < blocks.x; m++){
 
-								$.each(colors, function(){
+							$.each(colors, function(){
 
-									if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
+								if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
 
-										letters.push(this.letter);
-										return false;
+									letters.push(this.letter);
+									return false;
 
-									}
+								}
 
-								});
+							});
 
-								blockArray.shift();
+							blockArray.shift();
 
-							}
+						}
 
-							letters.push('\n'); //append line break
+						letters.push('\n'); //append line break
 
 					}
 
+					//Array.join() is much faster than String += in IEs
 					var art = '<pre style="line-height:' + charSize.y + 'px;">' + letters.join('') + '</pre>';
 					$img.after(art);
 
