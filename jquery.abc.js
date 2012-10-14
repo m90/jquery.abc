@@ -66,18 +66,23 @@
 						y : ~~(dimensions.height / charSize.y)
 
 					},
-					pic = $('<canvas>', {'class' : 'abc-picture'}).attr(dimensions).hide(),
+					pic = $('<canvas>').attr(dimensions),
 					picCtx = pic[0].getContext('2d');
 
-					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height, 'overflow' : 'hidden'}).css('display' , $img.css('display'))).after(pic);
-					$img.hide();
+					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height, 'overflow' : 'hidden'}).css('display' , $img.css('display'))).hide();
 
 					picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
 					var pixelArray = picCtx.getImageData(0, 0, dimensions.width, dimensions.height).data;
 
-					pic.remove();
+					var reducedPixelArray = [];
 
+					//get rid of alpha and reduce RGB to a single average value
+					for (var b = 0, c = pixelArray.length; b < c; b += 4){
+						reducedPixelArray.push(~~((pixelArray[b] + pixelArray[b + 1] + pixelArray[b + 2]) / 3));
+					}
+
+					//this will contain one luminance value for each letter-block
 					var blockArray = [];
 
 					for (var h = 0; h < blocks.y; h++){ //move along y at block level
@@ -85,22 +90,20 @@
 						for (var i = 0; i < blocks.x; i++){ //move along x at block level
 
 								var pixelsInBlock = [];
-								var baseOffset = h * charSize.y * dimensions.width * 4 + i * charSize.x * 4;
+								var baseOffset = h * charSize.y * dimensions.width + i * charSize.x;
 
 								for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
 
 									for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
 										
-										var currentOffset = baseOffset + (j * dimensions.width * 4 + k * 4);
-
-										var weight = (pixelArray[currentOffset] + pixelArray[currentOffset + 1] + pixelArray[currentOffset + 2]) / 3;
-
-										pixelsInBlock.push(weight);
+										var currentOffset = baseOffset + (j * dimensions.width + k);
+										pixelsInBlock.push(reducedPixelArray[currentOffset]);
 
 									}
 
 								}
 
+								//average all pixels in the block and push into blockArray
 								blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
 
 							}
@@ -129,7 +132,7 @@
 
 							}
 
-							letters.push('\n');
+							letters.push('\n'); //append line break
 
 					}
 
