@@ -68,7 +68,7 @@
 					pic = $('<canvas>').attr(dimensions),
 					picCtx = pic[0].getContext('2d');
 
-					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height, 'overflow' : 'hidden'}).css('display' , $img.css('display'))).hide();
+					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height}).css({'display' : $img.css('display'),  'overflow' : 'hidden'})).hide();
 
 					picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
