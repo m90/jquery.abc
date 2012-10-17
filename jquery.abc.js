@@ -87,56 +87,59 @@
 			var settings = $.extend({
 
 				letters : 'XMI/-.', //letters used, dark to light
-				invert : false //invert the letters if light text is used on a dark background
+				invert : false,
+				fps: 25 //invert the letters if light text is used on a dark background
 
 			}, options);
 
 			return this.each(function(){
 
-				if (this.nodeName === 'IMG'){
-
-					var
-					$img = $(this),
-					letters = settings.invert ? settings.letters.split('').reverse() : settings.letters.split(''),
-					colors = [],
-					dimensions = {
+				var letters = settings.invert ? settings.letters.split('').reverse() : settings.letters.split(''),
+				colors = [],
+				dimensions = {
 					
-						width: $img.width(),
-						height: $img.height()
+					width: $(this).width(),
+					height: $(this).height()
 					
-					};
+				};
 
-					for (var a = 0; a < letters.length; a++){
+				for (var a = 0; a < letters.length; a++){
 
-						colors.push({
+					colors.push({
 
-							top: 255 / letters.length * (a + 1),
-							bottom: 255 / letters.length * a,
-							letter: letters[a]
+						top: 255 / letters.length * (a + 1),
+						bottom: 255 / letters.length * a,
+						letter: letters[a]
 							
-						});
+					});
 
-					};
+				};
 
-					var dummy = $('<span>').text('a').css({'font-family' : 'monospace', 'visibility' : 'hidden'}).appendTo($img.parent());
+				//GET SIZE OF A SINGLE MONOSPACED CHARACTER
+				var dummy = $('<span>').text('a').css({'font-family' : 'monospace', 'visibility' : 'hidden'}).appendTo($(this).parent());
 					
 					var charSize = {
 						x : dummy.width(),
 						y : dummy.height()
 					};
 
-					dummy.remove();
-					
-					var blocks = {
+				dummy.remove();
 
-						x : ~~(dimensions.width / charSize.x),
-						y : ~~(dimensions.height / charSize.y)
+				var blocks = {
 
-					},
+					x : ~~(dimensions.width / charSize.x),
+					y : ~~(dimensions.height / charSize.y)
+
+				};
+
+				$(this).wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height}).css({'display' : $(this).css('display'),  'overflow' : 'hidden'})).hide();
+
+				if (this.nodeName === 'IMG'){ //IMAGE
+
+					var
+					$img = $(this),
 					pic = $('<canvas>').attr(dimensions),
 					picCtx = pic[0].getContext('2d');
-
-					$img.wrap($('<span>', {'class' : 'abc-wrapper', 'width': dimensions.width, 'height': dimensions.height}).css({'display' : $img.css('display'),  'overflow' : 'hidden'})).hide();
 
 					picCtx.drawImage($img[0], 0, 0, dimensions.width, dimensions.height);
 
@@ -146,9 +149,30 @@
 					$img.after(art);
 
 
+				} else if (this.nodeName === 'VIDEO'){ //VIDEO
+
+					var
+					$vid = $(this),
+					vid = $('<canvas>').attr(dimensions),
+					vidCtx = vid[0].getContext('2d');
+
+					$vid.after('<pre style="line-height:' + charSize.y + 'px;"></pre>');
+
+					var videoInterval = setInterval(function(){
+						
+						vidCtx.clearRect(0, 0, dimensions.width, dimensions.height);
+						vidCtx.drawImage($vid[0], 0, 0, dimensions.width, dimensions.height);
+
+						var pixelArray = vidCtx.getImageData(0, 0, dimensions.width, dimensions.height).data;
+						$vid.next('pre').text( _cpaToString(pixelArray, dimensions.width, charSize, blocks, colors));
+
+					}, 1000 / settings.fps);
+
+					$(this).data('abcInterval', videoInterval);
+
 				} else {
 
-					$.error('.abc() can only be applied to image elements!');
+					$.error('.abc() can only be applied to image and video elements!');
 
 				}
 
@@ -161,6 +185,10 @@
 			return this.each(function(){
 
 				$(this).show().next('pre').remove().end().unwrap();
+
+				if ($(this).data('abcInterval')){
+					clearInterval($(this).data('abcInterval'));
+				}
 
 			});
 
