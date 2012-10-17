@@ -9,6 +9,74 @@
 
 (function($){
 
+	function _cpaToString(cpa, width, charSize, blocks, colors){
+
+		var reducedPixelArray = [];
+
+		//get rid of alpha and reduce RGB to a single average value
+		for (var b = 0, c = cpa.length; b < c; b += 4){
+			reducedPixelArray.push(Math.max(cpa[b], cpa[b+1], cpa[b+2]));
+		}
+
+		//this will contain one luminance value for each letter-block
+		var blockArray = [];
+
+		for (var h = 0; h < blocks.y; h++){ //move along y at block level
+
+			for (var i = 0; i < blocks.x; i++){ //move along x at block level
+
+				var pixelsInBlock = [];
+				var baseOffset = h * charSize.y * width + i * charSize.x;
+
+				for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
+
+					for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
+										
+						var currentOffset = baseOffset + (j * width + k);
+							pixelsInBlock.push(reducedPixelArray[currentOffset]);
+
+						}
+
+					}
+
+				//average all pixels in the current block and push into blockArray
+				blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
+
+			}
+
+		}
+
+					
+		var letters = [];
+
+		for (var l = 0; l < blocks.y; l++){
+
+			for (var m = 0; m < blocks.x; m++){
+
+				$.each(colors, function(){
+
+					if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
+
+						letters.push(this.letter);
+						return false;
+
+					}
+
+				});
+
+				blockArray.shift();
+
+			}
+
+			letters.push('\n'); //append line break
+
+		}
+
+		//Array.join() is much faster than String += in IEs
+		return letters.join('');
+	
+	}
+
 	var methods = {
 
 		init : function(options){
@@ -74,69 +142,7 @@
 
 					var pixelArray = picCtx.getImageData(0, 0, dimensions.width, dimensions.height).data;
 
-					var reducedPixelArray = [];
-
-					//get rid of alpha and reduce RGB to a single average value
-					for (var b = 0, c = pixelArray.length; b < c; b += 4){
-						reducedPixelArray.push(Math.max(pixelArray[b], pixelArray[b+1], pixelArray[b+2]));
-					}
-
-					//this will contain one luminance value for each letter-block
-					var blockArray = [];
-
-					for (var h = 0; h < blocks.y; h++){ //move along y at block level
-
-						for (var i = 0; i < blocks.x; i++){ //move along x at block level
-
-							var pixelsInBlock = [];
-							var baseOffset = h * charSize.y * dimensions.width + i * charSize.x;
-
-							for (var j = 0; j < charSize.y; j++){ //move along y at pixel level
-
-								for (var k = 0; k < charSize.x; k++){ //move along x at pixel level
-										
-									var currentOffset = baseOffset + (j * dimensions.width + k);
-									pixelsInBlock.push(reducedPixelArray[currentOffset]);
-
-								}
-
-							}
-
-							//average all pixels in the current block and push into blockArray
-							blockArray.push(~~(pixelsInBlock.reduce(function(a,b){return a + b;}) / (charSize.x * charSize.y)));
-
-						}
-
-					}
-
-					
-					var letters = [];
-
-					for (var l = 0; l < blocks.y; l++){
-
-						for (var m = 0; m < blocks.x; m++){
-
-							$.each(colors, function(){
-
-								if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
-
-									letters.push(this.letter);
-									return false;
-
-								}
-
-							});
-
-							blockArray.shift();
-
-						}
-
-						letters.push('\n'); //append line break
-
-					}
-
-					//Array.join() is much faster than String += in IEs
-					var art = '<pre style="line-height:' + charSize.y + 'px;">' + letters.join('') + '</pre>';
+					var art = '<pre style="line-height:' + charSize.y + 'px;">' + _cpaToString(pixelArray, dimensions.width, charSize, blocks, colors) + '</pre>';
 					$img.after(art);
 
 
