@@ -78,7 +78,7 @@
 
 					//get rid of alpha and reduce RGB to a single average value
 					for (var b = 0, c = pixelArray.length; b < c; b += 4){
-						reducedPixelArray.push(~~((pixelArray[b] + pixelArray[b + 1] + pixelArray[b + 2]) / 3));
+						reducedPixelArray.push(Math.max(pixelArray[b], pixelArray[b+1], pixelArray[b+2]));
 					}
 
 					//this will contain one luminance value for each letter-block
