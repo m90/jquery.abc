@@ -53,16 +53,9 @@
 
 			for (var m = 0; m < blocks.x; m++){
 
-				$.each(colors, function(){
-
-					if (blockArray[0] <= this.top && blockArray[0] >= this.bottom){
-
-						letters.push(this.letter);
-						return false;
-
-					}
-
-				});
+				letters.push($.grep(colors, function(el, i){
+					return (blockArray[0] <= el.top && blockArray[0] >= el.bottom);
+				})[0].letter);
 
 				blockArray.shift();
 
