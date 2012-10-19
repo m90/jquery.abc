@@ -49,19 +49,21 @@
 					
 		var letters = [];
 
-		for (var l = 0; l < blocks.y; l++){
+		for (var l = 0, m = blockArray.length; l < m; l++){
 
-			for (var m = 0; m < blocks.x; m++){
+			letters.push($.grep(colors, function(el, i){
+					
+				return (blockArray[0] <= el.top && blockArray[0] >= el.bottom);
+				
+			})[0].letter);
 
-				letters.push($.grep(colors, function(el, i){
-					return (blockArray[0] <= el.top && blockArray[0] >= el.bottom);
-				})[0].letter);
+			blockArray.shift();
 
-				blockArray.shift();
-
+			if ((l + 1) % blocks.x === 0){
+				
+				letters.push('\n'); //append line break
+			
 			}
-
-			letters.push('\n'); //append line break
 
 		}
 
