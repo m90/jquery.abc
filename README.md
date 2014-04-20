@@ -7,4 +7,5 @@ Demos here: **[image](http://m90.github.io/jquery.abc/image/)** and **[video](ht
 
 You could also **[use it with your webcam](http://m90.github.io/jquery.abc/asciicam/)** (highly experimental - needs browser with `getUserMedia()` support!!)
 
-**BETA AS BETA CAN BE** use at your own risk.
+##License
+MIT © [Frederik Ring](http://www.frederikring.com)
